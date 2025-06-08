@@ -8,3 +8,25 @@ You can easily integrate the api into your product to prevent unwelcome usage of
 - telegram bot for giving licenses to users and admin panel
 - documentation
 - ~~simple auth~~
+
+## How to setup
+
+Firstly Install uv - https://docs.astral.sh/uv/getting-started/installation/
+
+Then you have to create SECRET_KEY
+
+```bash
+openssl rand -hex 32
+```
+
+Finally you have to create .env file in the project root and provide a secret
+
+```bash
+SECRET_KEY = "ENTER_YOUR_SECRET_KEY"
+```
+
+To run the api
+
+```bash
+uv run fastapi run/dev --port [YOUR_PORT]
+```
