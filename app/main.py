@@ -10,7 +10,7 @@ from app.auth import (
 )
 from datetime import timedelta
 from app.database import User, get_session
-from app.schemas import Token
+from app.schemas import Token, TokenData
 from contextlib import asynccontextmanager
 from sqlmodel import SQLModel, select
 from app.database import engine
@@ -70,6 +70,6 @@ def login_user(
 
 @app.get("/users/me/")
 async def read_users_me(
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[TokenData, Depends(get_current_user)],
 ):
     return current_user
