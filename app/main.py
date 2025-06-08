@@ -11,6 +11,7 @@ from sqlmodel import SQLModel, select
 from app.database import engine
 from app.config import settings
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
@@ -21,9 +22,11 @@ async def lifespan(app: FastAPI):
 
     engine.dispose()
 
+
 app = FastAPI(lifespan=lifespan)
 
 print(settings)
+
 
 @app.post("/auth/reg")
 def create_user(*, session: Session = Depends(get_session), user: User):
@@ -34,8 +37,13 @@ def create_user(*, session: Session = Depends(get_session), user: User):
     session.refresh(db_user)
     return db_user
 
+
 @app.post("/auth/login")
-def login_user(*, session: Session = Depends(get_session), form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+def login_user(
+    *,
+    session: Session = Depends(get_session),
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+) -> Token:
     user = session.exec(select(User).where(User.username == form_data.username)).first()
 
     logged = authenticate_user(user, form_data)
