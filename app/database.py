@@ -12,7 +12,7 @@ def get_session():
 
 
 class User(SQLModel, table=True):
-    telegram_id: int = Field(primary_key=True)
+    telegram_id: str = Field(primary_key=True)
     username: str
     password: str
     hwid: str | None = None

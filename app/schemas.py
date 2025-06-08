@@ -7,4 +7,6 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
+    telegram_id: str | None = None
     username: str | None = None
+    is_banned: bool

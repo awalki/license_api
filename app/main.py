@@ -2,7 +2,12 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 from typing import Annotated
-from app.auth import get_password_hash, authenticate_user, create_access_token
+from app.auth import (
+    get_current_user,
+    get_password_hash,
+    authenticate_user,
+    create_access_token,
+)
 from datetime import timedelta
 from app.database import User, get_session
 from app.schemas import Token
@@ -53,6 +58,18 @@ def login_user(
         )
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
-        data={"sub": logged.username}, expires_delta=access_token_expires
+        data={
+            "sub": logged.telegram_id,
+            "username": logged.username,
+            "is_banned": logged.is_banned,
+        },
+        expires_delta=access_token_expires,
     )
     return Token(access_token=access_token, token_type="bearer")
+
+
+@app.get("/users/me/")
+async def read_users_me(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    return current_user
