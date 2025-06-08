@@ -25,8 +25,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-print(settings)
-
 
 @app.post("/auth/reg")
 def create_user(*, session: Session = Depends(get_session), user: User):
