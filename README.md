@@ -7,6 +7,7 @@ You can easily integrate the api into your product to prevent unwelcome usage of
 
 - telegram bot for giving licenses to users and admin panel
 - documentation
+- connection library for connecting api and software (currently working on rust crate)
 - ~~simple auth~~
 
 ## How to setup
