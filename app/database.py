@@ -20,5 +20,5 @@ class User(SQLModel, table=True):
     telegram_id: str = Field(primary_key=True)
     username: str
     password: str
-    hwid: str | None = None
+    hwid: str = Field(default="not_linked")
     is_banned: bool = Field(default=False)

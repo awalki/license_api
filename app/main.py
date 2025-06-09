@@ -6,8 +6,12 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import SQLModel, select
 
-from app.auth import (authenticate_user, create_access_token, get_current_user,
-                      get_password_hash)
+from app.auth import (
+    authenticate_user,
+    create_access_token,
+    get_current_user,
+    get_password_hash,
+)
 from app.config import settings
 from app.database import SessionDep, User, engine
 from app.schemas import Hwid, Token, TokenData
@@ -53,6 +57,7 @@ def login_user(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={
@@ -85,7 +90,7 @@ async def link_hwid(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if not user.hwid:
+    if user.hwid == "not_linked":
         user.hwid = hwid.value
 
         session.add(user)
