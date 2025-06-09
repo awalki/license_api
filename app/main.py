@@ -58,6 +58,7 @@ def login_user(
         data={
             "sub": logged.telegram_id,
             "username": logged.username,
+            "hwid": logged.hwid,
             "is_banned": logged.is_banned,
         },
         expires_delta=access_token_expires,

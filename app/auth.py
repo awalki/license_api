@@ -50,6 +50,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         telegram_id = payload.get("sub")
         username = payload.get("username")
         is_banned = payload.get("is_banned")
+        hwid = payload.get("hwid")
 
         if telegram_id is None:
             raise credentials_exception
@@ -60,7 +61,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             )
 
         token_data = TokenData(
-            telegram_id=telegram_id, username=username, is_banned=is_banned
+            telegram_id=telegram_id, username=username, is_banned=is_banned, hwid=hwid
         )
 
         return token_data

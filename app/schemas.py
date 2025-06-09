@@ -13,5 +13,6 @@ class Hwid(BaseModel):
 
 class TokenData(BaseModel):
     telegram_id: str | None = None
-    username: str | None = None
+    username: str
     is_banned: bool
+    hwid: str
