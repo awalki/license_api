@@ -1,20 +1,16 @@
+from contextlib import asynccontextmanager
+from datetime import timedelta
+from typing import Annotated
+
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session
-from typing import Annotated
-from app.auth import (
-    get_current_user,
-    get_password_hash,
-    authenticate_user,
-    create_access_token,
-)
-from datetime import timedelta
-from app.database import User, get_session
-from app.schemas import Token, TokenData
-from contextlib import asynccontextmanager
 from sqlmodel import SQLModel, select
-from app.database import engine
+
+from app.auth import (authenticate_user, create_access_token, get_current_user,
+                      get_password_hash)
 from app.config import settings
+from app.database import SessionDep, User, engine
+from app.schemas import Hwid, Token, TokenData
 
 
 @asynccontextmanager
@@ -31,8 +27,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+# Prefer to call this endpoint from server (SSR Website, Telegram Bot) to prevent HTTP sniffing using programs like HttpDebugger
 @app.post("/auth/reg")
-def create_user(*, session: Session = Depends(get_session), user: User):
+def create_user(*, session: SessionDep, user: User):
     db_user = User.model_validate(user)
     db_user.password = get_password_hash(db_user.password)
     session.add(db_user)
@@ -44,7 +41,7 @@ def create_user(*, session: Session = Depends(get_session), user: User):
 @app.post("/auth/login")
 def login_user(
     *,
-    session: Session = Depends(get_session),
+    session: SessionDep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
     user = session.exec(select(User).where(User.username == form_data.username)).first()
@@ -73,3 +70,29 @@ async def read_users_me(
     current_user: Annotated[TokenData, Depends(get_current_user)],
 ):
     return current_user
+
+
+@app.patch("/users/hwid")
+async def link_hwid(
+    *,
+    session: SessionDep,
+    current_user: Annotated[TokenData, Depends(get_current_user)],
+    hwid: Hwid,
+):
+    user = session.get(User, current_user.telegram_id)
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not user.hwid:
+        user.hwid = hwid.value
+
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+        return {"message": "hwid has been successfully linked"}
+
+    return HTTPException(
+        status_code=status.HTTP_409_CONFLICT, detail="hwid's already linked"
+    )

@@ -1,14 +1,15 @@
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import status, Depends, HTTPException
 from datetime import datetime, timedelta, timezone
-import jwt
-from jwt.exceptions import InvalidTokenError
-from app.database import User
-from app.config import settings
 from typing import Annotated
-from app.schemas import TokenData
 
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jwt.exceptions import InvalidTokenError
+from passlib.context import CryptContext
+
+from app.config import settings
+from app.database import User
+from app.schemas import TokenData
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
