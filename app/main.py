@@ -99,6 +99,6 @@ async def link_hwid(
 
         return {"message": "hwid has been successfully linked"}
 
-    return HTTPException(
+    raise HTTPException(
         status_code=status.HTTP_409_CONFLICT, detail="hwid's already linked"
     )

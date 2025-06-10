@@ -5,10 +5,20 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "coverage>=7.8.2",
     "fastapi[standard]>=0.115.12",
     "isort>=6.0.1",
     "passlib[bcrypt]>=1.7.4",
     "pydantic-settings>=2.9.1",
     "pyjwt>=2.10.1",
+    "pytest>=8.4.0",
     "sqlmodel>=0.0.24",
+]
+
+[dependency-groups]
+test = [
+    "httpx>=0.28.1",
+    "pytest>=8.4.0",
+    "pytest-asyncio>=1.0.0",
+    "pytest-cov>=6.1.1",
 ]
