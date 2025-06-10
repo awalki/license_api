@@ -1,0 +1,33 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+
+  status:
+    project:
+      default:
+        target: 100%
+        threshold: 1%
+        if_no_uploads: error
+        if_not_found: success
+        if_ci_failed: error
+    patch:
+      default:
+        target: 100%
+        threshold: 1%
+        if_no_uploads: error
+        if_not_found: success
+        if_ci_failed: error
+
+  ignore:
+    - "tests/"
+    - "**/__pycache__/"
+    - "**/*.pyc"
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
