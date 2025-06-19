@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -13,8 +13,8 @@ from app.auth import (
     get_password_hash,
 )
 from app.config import settings
-from app.database import SessionDep, User, engine
-from app.schemas import Hwid, Token, TokenData
+from app.database import License, SessionDep, User, engine
+from app.schemas import Hwid, LicenseCreate, Token, TokenData
 
 
 @asynccontextmanager
@@ -102,3 +102,31 @@ async def link_hwid(
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT, detail="hwid's already linked"
     )
+
+@app.post("/users/license")
+async def create_license(
+    *,
+    session: SessionDep,
+    current_user: Annotated[TokenData, Depends(get_current_user)],
+    license_data: LicenseCreate,
+):
+    user = session.get(User, current_user.telegram_id)
+
+    expires_at = datetime.utcnow() + timedelta(days=license_data.days)
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.is_banned:
+        raise HTTPException(status_code=403, detail="User is banned")
+
+    if user.hwid == "not_linked":
+        raise HTTPException(status_code=403, detail="hwid is not linked")
+
+    license = License(user_id=user.telegram_id, expires_at=expires_at)
+
+    session.add(license)
+    session.commit()
+    session.refresh(license)
+
+    return {"message": "license has been successfully created"}

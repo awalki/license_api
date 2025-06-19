@@ -16,3 +16,6 @@ class TokenData(BaseModel):
     username: str
     is_banned: bool
     hwid: str
+
+class LicenseCreate(BaseModel):
+    days: int
