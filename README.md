@@ -31,3 +31,11 @@ To run the api
 ```bash
 uv run fastapi run/dev --port [YOUR_PORT]
 ```
+
+Also you can run the license api with Docker
+
+```bash
+docker build -t license_api .
+
+docker run -e SECRET_KEY="YOUR_SECRET_KEY" -p 8080:8080 license_api
+```
