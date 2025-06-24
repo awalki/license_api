@@ -32,6 +32,8 @@ To run the api
 uv run fastapi run/dev --port [YOUR_PORT]
 ```
 
+### Docker
+
 Also you can run the license api with Docker
 
 ```bash
