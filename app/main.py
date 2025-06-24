@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -54,7 +54,7 @@ def login_user(
     if not logged:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect username or password, perhaps you don't have an activated license or your account is banned",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -112,13 +112,10 @@ async def create_license(
 ):
     user = session.get(User, current_user.telegram_id)
 
-    expires_at = datetime.utcnow() + timedelta(days=license_data.days)
+    expires_at = datetime.now(timezone.utc) + timedelta(days=license_data.days)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    if user.is_banned:
-        raise HTTPException(status_code=403, detail="User is banned")
 
     if user.hwid == "not_linked":
         raise HTTPException(status_code=403, detail="hwid is not linked")

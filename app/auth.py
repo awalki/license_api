@@ -69,9 +69,20 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise credentials_exception
 
 
+def verify_expire(time: datetime):
+    return time > datetime.now(timezone.utc)
+
+
 def authenticate_user(user: User | None, data: OAuth2PasswordRequestForm):
     if not user:
         return False
     if not verify_password(data.password, user.password):
         return False
+    if user.is_banned:
+        return False
+    if not user.license:
+        return False
+    if not verify_expire(user.license.expires_at):
+        return False
+
     return user
