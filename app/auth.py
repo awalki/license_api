@@ -70,6 +70,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 def verify_expire(time: datetime):
+    if time.tzinfo is None:
+        time = time.replace(tzinfo=timezone.utc)
     return time > datetime.now(timezone.utc)
 
 

@@ -18,4 +18,5 @@ class TokenData(BaseModel):
     hwid: str
 
 class LicenseCreate(BaseModel):
+    telegram_id: str
     days: int

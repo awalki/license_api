@@ -1,0 +1,41 @@
+{% extends 'base.html' %} {% block content %}
+<div id="login" class="min-h-screen flex items-center justify-center">
+    <div class="toast" id="login-error"></div>
+
+    <form
+        hx-post="/admin/login"
+        hx-swap="innerHTML"
+        hx-on:htmx:response-error="
+            document.getElementById('login-error').innerHTML =
+              '<div class=&quot;alert alert-error&quot;><span>Invalid credentials</span></div>';
+          "
+        hx-target="#login"
+        method="post"
+    >
+        <div class="card card bg-base-200 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Login</h2>
+
+                <input
+                    class="input"
+                    type="text"
+                    name="username"
+                    required
+                    placeholder="Username"
+                />
+                <input
+                    class="input"
+                    type="password"
+                    name="password"
+                    required
+                    placeholder="Password"
+                />
+
+                <div class="card-actions">
+                    <button class="btn btn-primary">Login</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+> {% endblock %}

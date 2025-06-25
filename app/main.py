@@ -4,8 +4,10 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
 from sqlmodel import SQLModel, select
 
+from app.admin import admin
 from app.auth import (
     authenticate_user,
     create_access_token,
@@ -30,6 +32,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+app.include_router(admin)
 
 # Prefer to call this endpoint from server (SSR Website, Telegram Bot) to prevent HTTP sniffing using programs like HttpDebugger
 @app.post("/auth/reg")
@@ -103,22 +108,20 @@ async def link_hwid(
         status_code=status.HTTP_409_CONFLICT, detail="hwid's already linked"
     )
 
+# TODO: implement jwt for admins
+# Prefer to call this endpoint from server (SSR Website, Telegram Bot) to prevent HTTP sniffing using programs like HttpDebugger
 @app.post("/users/license")
 async def create_license(
     *,
     session: SessionDep,
-    current_user: Annotated[TokenData, Depends(get_current_user)],
     license_data: LicenseCreate,
 ):
-    user = session.get(User, current_user.telegram_id)
+    user = session.get(User, license_data.telegram_id)
 
     expires_at = datetime.now(timezone.utc) + timedelta(days=license_data.days)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    if user.hwid == "not_linked":
-        raise HTTPException(status_code=403, detail="hwid is not linked")
 
     license = License(user_id=user.telegram_id, expires_at=expires_at)
 
