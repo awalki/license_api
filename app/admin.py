@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from typing import Annotated
 from app.database import User
 from sqlmodel import select
+from app.config import settings
 
 from app.database import SessionDep
 
@@ -15,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 async def login(*, session: SessionDep, request: Request, username: Annotated[str, Form()], password: Annotated[str, Form()]):
     user = {
         "username": "admin",
-        "password": "mtcdeveloper"
+        "password": settings.admin_password
     }
 
     if password != user["password"] or username != user["username"] or user["username"] != username:
