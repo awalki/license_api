@@ -12,11 +12,11 @@ class Hwid(BaseModel):
 
 
 class TokenData(BaseModel):
-    telegram_id: str | None = None
+    id: str | None = None
     username: str
     is_banned: bool
     hwid: str
 
 class LicenseCreate(BaseModel):
-    telegram_id: str
+    id: str
     days: int

@@ -12,6 +12,25 @@ admin = APIRouter(prefix="/admin", tags=["Admin"])
 
 templates = Jinja2Templates(directory="templates")
 
+@admin.patch("/users/{id}")
+async def ban_user(*, request: Request, session: SessionDep, id: int):
+    user = session.get(User, id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.is_banned = not user.is_banned
+    session.commit()
+    session.refresh(user)
+
+    users = session.exec(select(User)).all()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="panel.html",
+        context={"users": users}
+    )
+
+
 @admin.post("/login")
 async def login(*, session: SessionDep, request: Request, username: Annotated[str, Form()], password: Annotated[str, Form()]):
     user = {

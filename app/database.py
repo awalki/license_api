@@ -17,7 +17,7 @@ def get_session():
 SessionDep = Annotated[Session, Depends(get_session)]
 
 class User(SQLModel, table=True):
-    telegram_id: str = Field(primary_key=True)
+    id: str = Field(primary_key=True)
     username: str
     password: str
     hwid: str = Field(default="not_linked")
@@ -27,7 +27,7 @@ class User(SQLModel, table=True):
 
 class License(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: str = Field(default=None, foreign_key="user.telegram_id")
+    user_id: str = Field(default=None, foreign_key="user.id")
     # maybe 14 30 days
     expires_at: datetime
 

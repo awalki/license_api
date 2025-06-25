@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from datetime import timedelta, datetime, timezone
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import SQLModel, select
@@ -17,6 +17,7 @@ from app.auth import (
 from app.config import settings
 from app.database import License, SessionDep, User, engine
 from app.schemas import Hwid, LicenseCreate, Token, TokenData
+from app.admin import templates
 
 
 @asynccontextmanager
@@ -38,13 +39,16 @@ app.include_router(admin)
 
 # Prefer to call this endpoint from server (SSR Website, Telegram Bot) to prevent HTTP sniffing using programs like HttpDebugger
 @app.post("/auth/reg")
-def create_user(*, session: SessionDep, user: User):
+def create_user(*, request: Request,session: SessionDep, user: User):
     db_user = User.model_validate(user)
     db_user.password = get_password_hash(db_user.password)
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
-    return db_user
+
+    users = session.exec(select(User)).all()
+
+    return templates.TemplateResponse("panel.html", {"request": request, "users": users})
 
 
 @app.post("/auth/login")
@@ -66,7 +70,7 @@ def login_user(
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={
-            "sub": logged.telegram_id,
+            "sub": logged.id,
             "username": logged.username,
             "hwid": logged.hwid,
             "is_banned": logged.is_banned,
@@ -90,7 +94,7 @@ async def link_hwid(
     current_user: Annotated[TokenData, Depends(get_current_user)],
     hwid: Hwid,
 ):
-    user = session.get(User, current_user.telegram_id)
+    user = session.get(User, current_user.id)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -114,19 +118,28 @@ async def link_hwid(
 async def create_license(
     *,
     session: SessionDep,
+    request: Request,
     license_data: LicenseCreate,
 ):
-    user = session.get(User, license_data.telegram_id)
+    user = session.get(User, license_data.id)
 
     expires_at = datetime.now(timezone.utc) + timedelta(days=license_data.days)
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    license = License(user_id=user.telegram_id, expires_at=expires_at)
+    # Create or refresh license
+    if user.license:
+        session.delete(user.license)
+        session.commit()
+        session.refresh(user)
+
+    license = License(user_id=user.id, expires_at=expires_at)
 
     session.add(license)
     session.commit()
     session.refresh(license)
 
-    return {"message": "license has been successfully created"}
+    users = session.query(User).all()
+
+    return templates.TemplateResponse("panel.html", {"request": request, "users": users})
