@@ -1,0 +1,60 @@
+{% extends 'base.html' %} {% block content %}
+<div id="reg-form">
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.5"></script>
+
+    <h1 class="text-2xl">Admin user not created yet</h1>
+    <p class="text-center">You have to create an admin account</p>
+
+    <form
+        hx-post="/auth/reg-admin"
+        method="post"
+        hx-swap="outerHTML"
+        hx-target="#reg-form"
+        class="flex flex-col gap-4 justify-center pt-4"
+        hx-ext="json-enc"
+        hx-headers='{"Content-Type":"application/json"}'
+    >
+        <input
+            class="input"
+            placeholder="id"
+            name="id"
+            value="0"
+            readonly
+            hidden
+            required
+        />
+
+        <input class="input" placeholder="username" name="username" required />
+
+        <input
+            class="input"
+            placeholder="password"
+            name="password"
+            type="password"
+            password
+            required
+        />
+
+        <input
+            class="input"
+            placeholder="is_admin"
+            name="is_admin"
+            value="true"
+            readonly
+            hidden
+            required
+        />
+
+        <input
+            class="input"
+            type="password"
+            placeholder="apassword"
+            name="apassword"
+            required
+        />
+
+        <button class="btn btn-soft btn-success">Register</button>
+    </form>
+</div>
+{% endblock %}

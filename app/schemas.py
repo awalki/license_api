@@ -6,9 +6,16 @@ class Token(BaseModel):
     token_type: str
 
 
-# TODO: Add fields like MAC, IP, another serials
 class Hwid(BaseModel):
     value: str
+
+
+class AdminCreate(BaseModel):
+    apassword: str
+    id: str
+    username: str
+    password: str
+    is_admin: bool
 
 
 class TokenData(BaseModel):
@@ -16,6 +23,8 @@ class TokenData(BaseModel):
     username: str
     is_banned: bool
     hwid: str
+    is_admin: bool
+
 
 class LicenseCreate(BaseModel):
     id: str

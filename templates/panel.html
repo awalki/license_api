@@ -15,6 +15,7 @@
             method="dialog"
             class="modal-box space-y-4 p-6"
             hx-post="/auth/reg"
+            hx-headers='{"Authorization": "{{ token }}"}'
             hx-target="#table"
             hx-swap="outerHTML"
             hx-ext="json-enc"
@@ -131,6 +132,7 @@
                             class="modal-box space-y-4 p-6"
                             hx-post="/users/license"
                             hx-swap="outerHTML"
+                            hx-headers='{"Authorization": "{{ token }}"}'
                             hx-ext="json-enc"
                             hx-headers='{"Content-Type":"application/json"}'
                             hx-target="#table"
@@ -183,6 +185,7 @@
                     <button
                         class="btn btn-xs btn-error"
                         hx-patch="/admin/users/{{ user.id }}"
+                        hx-headers='{"Authorization": "{{ token }}"}'
                         hx-swap="innerHTML"
                         hx-target="#table"
                     >
