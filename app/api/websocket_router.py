@@ -9,7 +9,7 @@ websocket_router = APIRouter()
 @websocket_router.websocket("/ws/notify")
 async def websocket_notify(
     ws: WebSocket,
-    username: str,
+    token: str,
     websocket_service: WebSocketService = Depends(get_websocket_service),
 ):
-    return await websocket_service.websocket_notify(ws, username)
+    return await websocket_service.websocket_notify(ws, token)

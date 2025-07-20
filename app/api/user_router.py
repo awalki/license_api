@@ -18,3 +18,10 @@ async def create_license(
     user_service: UserService = Depends(get_user_service),
 ):
     return await user_service.create_license(request, current_user.username)
+
+
+@user_router.get("/users/me", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
+async def get_current_user_info(
+    current_user: Annotated[TokenData, Depends(get_current_user)],
+):
+    return current_user
