@@ -6,12 +6,18 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
     )
+    # Telegram settings
+    admin_id: str
+    webhook_url: str
+    bot_token: str
+    redis_url: str = "redis://localhost:6379"
+    host: str = "0.0.0.0"
+    port: int = 8000
 
+    # Auth settings
     secret_key: str
-    admin_password: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 
 
-# check if the SECRET_KEY is set
-settings = Settings()
+settings = Settings()  # type: ignore
