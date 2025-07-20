@@ -1,3 +1,4 @@
+from fastapi.logger import logger
 from sqlmodel import Session, select
 
 from app.db.database import License, User
@@ -13,6 +14,11 @@ class UserRepository:
         user = self.db.exec(select(User).where(User.username == username)).first()
 
         return user
+    
+    def get_all_users(self):
+        users = self.db.exec(select(User)).all()
+        
+        return users
 
     def get_by_license_id(self, license_id: str) -> User | None:
         user = self.db.exec(select(User).where(User.license.id == license_id)).first()
@@ -28,7 +34,7 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(db_user)
         except Exception:
-            print("User with this username already exists")
+            logger.error("User with this username already exists")
 
     def link_hwid(self, user: User, new_hwid):
         if user.hwid == "not_linked":

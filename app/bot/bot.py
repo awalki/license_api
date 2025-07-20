@@ -1,6 +1,7 @@
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.base import DefaultKeyBuilder
 from aiogram.fsm.storage.redis import RedisStorage
+
 from app.config import settings
 
 key_builder = DefaultKeyBuilder(with_destiny=True)

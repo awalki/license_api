@@ -11,8 +11,6 @@ class Settings(BaseSettings):
     webhook_url: str
     bot_token: str
     redis_url: str = "redis://localhost:6379"
-    host: str = "0.0.0.0"
-    port: int = 8000
 
     # Auth settings
     secret_key: str

@@ -1,3 +1,4 @@
+import logging
 import jwt
 from fastapi import Depends, HTTPException, status
 from sqlmodel import Session

@@ -18,7 +18,6 @@ from app.bot.state import license_dialog, user_dialog
 from app.config import settings
 from app.db.database import engine
 
-
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     try:
@@ -30,7 +29,7 @@ async def lifespan(_: FastAPI):
         setup_dialogs(dp)
         await bot.set_webhook(settings.webhook_url)
     except Exception as e:
-        print(f"[ERROR] Cannot create a table: {e}")
+        logging.error(f"[ERROR] Cannot create a table: {e}")
     yield
     logging.info("Shutting down bot...")
     await FastAPILimiter.close()

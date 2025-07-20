@@ -1,8 +1,7 @@
-from aiogram import Router, F, types
-
-from app.bot.middleware.admin import AdminMiddleware
+from aiogram import F, Router, types
 from aiogram_dialog import DialogManager, StartMode
 
+from app.bot.middleware.admin import AdminMiddleware
 from app.bot.state import SG, SGL
 
 admin_router = Router()
@@ -17,3 +16,9 @@ async def register_user(message: types.Message, dialog_manager: DialogManager):
 @admin_router.message(F.text.lower().contains("license"))
 async def give_license(message: types.Message, dialog_manager: DialogManager):
     await dialog_manager.start(state=SGL.username, mode=StartMode.RESET_STACK)
+
+
+@admin_router.message(F.text.lower().contains("users"))
+async def list_users(message: types.Message, dialog_manager: DialogManager):
+    user_list = "\n".join([f"{user.id} - {user.username}" for user in users])
+    await message.answer(f"Registered Users:\n{user_list or 'No users found.'}")

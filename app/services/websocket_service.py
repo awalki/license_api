@@ -1,4 +1,6 @@
+import logging
 from fastapi import WebSocket, WebSocketDisconnect
+
 from app.repos.user import UserRepository
 from app.services.bot_service import BotService
 
@@ -12,7 +14,10 @@ class WebSocketService(BotService):
         await ws.accept()
         try:
             user = self.user_repo.get_by_username(username)
-
+            if not user:
+                await ws.close(code=1008)
+                return
+            
             self.connected_clients.add(ws)
 
             await self.handle_launch(user)
@@ -23,4 +28,4 @@ class WebSocketService(BotService):
                     await ws.send_text("pong")
 
         except WebSocketDisconnect:
-            print("ws disconnected")
+            logging.info(f"Client {username} disconnected")
