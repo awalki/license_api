@@ -10,8 +10,6 @@ from app.services.auth_service import AuthService
 
 auth_router = APIRouter()
 
-auth_router.middleware_stack
-
 
 @auth_router.post(
     "/auth/login", dependencies=[Depends(RateLimiter(times=2, seconds=5))]
