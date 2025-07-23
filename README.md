@@ -43,7 +43,7 @@ docker build -t license_api .
 
 docker run \
   -e SECRET_KEY="YOUR_SECRET_KEY" \
-  -e ADMIN_PASSWORD="YOUR_ADMIN_PANEL_PASSWORD" \
+  -e ADMIN_ID="YOUR_ADMIN_ID" \
   -e WEBHOOK_URL = "https://your-webhook-for-telegram/webhook" \
   -e BOT_TOKEN = "YOUR_BOT_TOKEN" \
   -p 8080:8080 \
