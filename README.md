@@ -152,5 +152,6 @@ If you encounter any issues:
 - [x] API rate limiting
 - [ ] More Database support
 - [ ] Web dashboard
+- [ ] Test coverage
 - [ ] License analytics
 - [ ] Bulk operations
