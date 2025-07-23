@@ -23,7 +23,7 @@ A robust license management API built with FastAPI, SQLModel, and aiogram for Te
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/awalki/license_api
    cd license-api
    ```
 
