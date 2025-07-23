@@ -8,7 +8,6 @@ A robust license management API built with FastAPI, SQLModel, and aiogram for Te
 - **FastAPI Backend**: High-performance async API with automatic documentation
 - **SQLModel Integration**: Type-safe database operations with SQLAlchemy
 - **Telegram Bot**: Manage licenses through a convenient Telegram interface
-- **Redis Caching**: Fast license validation with Redis support
 - **Authentication**: Secure API endpoints with token-based auth
 - **Docker Support**: Easy deployment with Docker containers
 
