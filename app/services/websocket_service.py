@@ -16,23 +16,28 @@ class WebSocketService(BotService):
         await ws.accept()
         try:
             payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-
             username = payload.get("username")
-            
             user = self.user_repo.get_by_username(username)
             if not user:
                 await ws.close(code=1008)
                 return
-            
-            self.connected_clients.add(ws)
 
+            self.connected_clients.add(ws)
             await self.handle_launch(user)
+
             while True:
-                text = await ws.receive_text()
+                try:
+                    text = await ws.receive_text()
+                except WebSocketDisconnect:
+                    break
 
                 if text == "ping":
                     await ws.send_text("pong")
 
-        except Exception:
-            await ws.close(code=1008)
+        except Exception as e:
+            logging.error(f"Error in websocket_notify: {e!r}")
+            await ws.close(code=1011)
+
+        finally:
+            self.connected_clients.discard(ws)
             logging.info(f"Client {ws.client.host} disconnected")
