@@ -1,12 +1,13 @@
 from datetime import datetime, timedelta, timezone
+
+import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
-import pytest
-from sqlmodel import SQLModel, Session, StaticPool, create_engine, select
+from sqlmodel import Session, SQLModel, StaticPool, create_engine, select
+
 from app.api.deps import get_user_repo
 from app.db.database import User, get_session
 from app.main import app
-from app.utils.helpers import get_password_hash
 from app.schemas.user import LoginRequest
 
 
@@ -19,28 +20,31 @@ def session_fixture():
     with Session(engine) as session:
         yield session
 
-@pytest.fixture(name="client")  
-def client_fixture(session: Session):  
-    def get_session_override():  
 
+@pytest.fixture(name="client")
+def client_fixture(session: Session):
+    def get_session_override():
         return session
 
-    app.dependency_overrides[get_session] = get_session_override  
+    app.dependency_overrides[get_session] = get_session_override
 
-    client = TestClient(app)  
+    client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
 
 def test_user_repo(session: Session):
     user_repo = get_user_repo(session)
 
-    user_repo.create_user(User(
-        username="testuser",
-        id="1",
-        hwid="not_linked",
-        is_admin=False,
-        password="12345"
-    ))
+    user_repo.create_user(
+        User(
+            username="testuser",
+            id="1",
+            hwid="not_linked",
+            is_admin=False,
+            password="12345",
+        )
+    )
 
     user_from_db = session.exec(select(User).where(User.username == "testuser")).first()
 
@@ -71,20 +75,14 @@ def test_user_repo(session: Session):
 
     assert users
 
-    login_request = LoginRequest(
-        username="testuser",
-        password="12345",
-        hwid="new_hwid"
-    )
+    login_request = LoginRequest(username="testuser", password="12345", hwid="new_hwid")
 
     is_auth = user_repo.authenticate_user(user, login_request)
 
     assert is_auth
 
     login_request = LoginRequest(
-        username="testuser",
-        password="123456",
-        hwid="new_hwid"
+        username="testuser", password="123456", hwid="new_hwid"
     )
 
     is_auth = user_repo.authenticate_user(user, login_request)
@@ -92,9 +90,7 @@ def test_user_repo(session: Session):
     assert not is_auth
 
     login_request = LoginRequest(
-        username="testuser",
-        password="12345",
-        hwid="invalid_hwid"
+        username="testuser", password="12345", hwid="invalid_hwid"
     )
 
     is_auth = user_repo.authenticate_user(user, login_request)
@@ -104,9 +100,7 @@ def test_user_repo(session: Session):
     unknown_user = user_repo.get_by_username("unknown_user")
 
     login_request = LoginRequest(
-        username="unknown_username",
-        password="12345",
-        hwid="new_hwid"
+        username="unknown_username", password="12345", hwid="new_hwid"
     )
 
     is_auth = user_repo.authenticate_user(unknown_user, login_request)
@@ -120,9 +114,7 @@ def test_user_repo(session: Session):
     assert not is_auth
 
     login_request = LoginRequest(
-        username="unknown_username",
-        password="12345",
-        hwid="new_hwid"
+        username="unknown_username", password="12345", hwid="new_hwid"
     )
 
     user.license = None
@@ -132,25 +124,24 @@ def test_user_repo(session: Session):
     assert not is_auth
 
     login_request = LoginRequest(
-        username="unknown_username",
-        password="12345",
-        hwid="new_hwid"
+        username="unknown_username", password="12345", hwid="new_hwid"
     )
 
-    user.is_banned = True;
-
+    user.is_banned = True
     is_auth = user_repo.authenticate_user(user, login_request)
 
     assert not is_auth
 
     # already exists
     with pytest.raises(HTTPException) as exc_info:
-        user_repo.create_user(User(username="testuser",
-        id="1",
-        hwid="not_linked",
-        is_admin=False,
-        password="12345"))
+        user_repo.create_user(
+            User(
+                username="testuser",
+                id="1",
+                hwid="not_linked",
+                is_admin=False,
+                password="12345",
+            )
+        )
 
     assert exc_info.value.status_code == 409
-
-

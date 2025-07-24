@@ -18,6 +18,7 @@ from app.bot.state import license_dialog, user_dialog
 from app.config import settings
 from app.db.database import engine
 
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     try:

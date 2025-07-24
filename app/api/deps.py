@@ -1,6 +1,6 @@
-import logging
 import jwt
 from fastapi import Depends, HTTPException, status
+from fastapi_limiter.depends import RateLimiter
 from sqlmodel import Session
 from typing_extensions import Annotated
 
@@ -12,7 +12,6 @@ from app.services.auth_service import AuthService
 from app.services.user_service import UserService
 from app.services.websocket_service import WebSocketService
 from app.utils.helpers import oauth2_scheme
-from fastapi_limiter.depends import RateLimiter
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> TokenData:
@@ -42,16 +41,17 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 limiter = RateLimiter(times=2, seconds=5)
 
+
 def get_auth_service(
     db: SessionDep,
 ):
     user_repo = get_user_repo(db)
     return AuthService(user_repo)
 
-def get_user_repo(
-    db: SessionDep
-):
+
+def get_user_repo(db: SessionDep):
     return UserRepository(db)
+
 
 def get_user_service(
     db: SessionDep,

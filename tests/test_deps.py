@@ -1,8 +1,10 @@
 from datetime import timedelta
+
+import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
-import pytest
-from sqlmodel import SQLModel, Session, StaticPool, create_engine
+from sqlmodel import Session, SQLModel, StaticPool, create_engine
+
 from app.api.deps import get_current_user
 from app.db.database import get_session
 from app.main import app
@@ -18,17 +20,18 @@ def session_fixture():
     with Session(engine) as session:
         yield session
 
-@pytest.fixture(name="client")  
-def client_fixture(session: Session):  
-    def get_session_override():  
 
+@pytest.fixture(name="client")
+def client_fixture(session: Session):
+    def get_session_override():
         return session
 
-    app.dependency_overrides[get_session] = get_session_override  
+    app.dependency_overrides[get_session] = get_session_override
 
-    client = TestClient(app)  
+    client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
 
 @pytest.mark.anyio
 async def test_get_current_user():
@@ -39,6 +42,7 @@ async def test_get_current_user():
     assert current_user.id == "1"
     assert current_user.username == "testuser"
 
+
 @pytest.mark.anyio
 async def test_get_current_user_invalid_token():
     token = "INVALID_TOKEN"
@@ -48,9 +52,12 @@ async def test_get_current_user_invalid_token():
 
     assert exc_info.value.status_code == 401
 
+
 @pytest.mark.anyio
 async def test_get_current_user_expired_token():
-    token = create_access_token({"username": "testuser", "id": "1"}, timedelta(minutes=-5))
+    token = create_access_token(
+        {"username": "testuser", "id": "1"}, timedelta(minutes=-5)
+    )
 
     with pytest.raises(HTTPException) as exc_info:
         await get_current_user(token)

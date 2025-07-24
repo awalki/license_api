@@ -1,13 +1,15 @@
 from datetime import datetime, timedelta, timezone
-from fastapi.testclient import TestClient
-import pytest
-from sqlmodel import SQLModel, Session, StaticPool, create_engine, select
 
+import pytest
+from fastapi.testclient import TestClient
+from sqlmodel import Session, SQLModel, StaticPool, create_engine, select
+
+from app.api.deps import get_current_user, limiter
 from app.db.database import License, User, get_session
 from app.main import app
-from app.api.deps import get_current_user, limiter
 from app.schemas.user import LoginRequest, TokenData
 from app.utils.helpers import get_password_hash, verify_expire, verify_password
+
 
 class DummyRepo:
     def __init__(self, session: Session):
@@ -32,9 +34,9 @@ class DummyRepo:
             is_banned=False,
             is_admin=True,
             license=License(expires_at=datetime.now(timezone.utc) + timedelta(days=1)),
-            hwid="not_linked"
+            hwid="not_linked",
         )
-    
+
     def link_hwid(self, user: User, new_hwid):
         if user.hwid == "not_linked":
             user.hwid = new_hwid
@@ -42,7 +44,7 @@ class DummyRepo:
             self.session.add(user)
             self.session.commit()
             self.session.refresh(user)
-    
+
     def authenticate_user(self, user: User | None, request: LoginRequest):
         if not user:
             return False
@@ -73,43 +75,43 @@ def session_fixture():
     with Session(engine) as session:
         yield session
 
-@pytest.fixture(name="client")  
-def client_fixture(session: Session):  
-    def get_session_override():  
 
+@pytest.fixture(name="client")
+def client_fixture(session: Session):
+    def get_session_override():
         return session
 
-    app.dependency_overrides[get_session] = get_session_override  
+    app.dependency_overrides[get_session] = get_session_override
 
-    client = TestClient(app)  
+    client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
 
 @pytest.fixture(autouse=True)
 def override_repo(monkeypatch, session: Session):
     monkeypatch.setattr("app.api.deps.get_user_repo", lambda db: DummyRepo(session))
 
+
 def test_create_user(client: TestClient, session: Session):
     payload = {"username": "testuser", "password": "1234", "is_admin": True, "id": "1"}
 
     def override_get_current_user():
-        return TokenData(
-            username="testuser",
-            id="1"
-        )
-    
+        return TokenData(username="testuser", id="1")
+
     app.dependency_overrides[limiter] = lambda: None
     app.dependency_overrides[get_current_user] = override_get_current_user
-    
+
     response = client.post("auth/reg", json=payload)
 
     user_from_db = session.exec(select(User).where(User.username == "testuser")).first()
- 
+
     assert response.status_code == 200
 
     assert user_from_db is not None
     assert user_from_db.hwid == "not_linked"
     assert {"message": "user has successfully registered"}
+
 
 def test_login_user(client: TestClient, session: Session):
     payload = {"username": "testuser", "password": "1234", "hwid": "some-hwid"}

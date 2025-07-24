@@ -1,9 +1,10 @@
 import logging
-from fastapi import WebSocket, WebSocketDisconnect
-import jwt
 
-from app.repos.user import UserRepository
+import jwt
+from fastapi import WebSocket, WebSocketDisconnect
+
 from app.config import settings
+from app.repos.user import UserRepository
 from app.services.bot_service import BotService
 
 
@@ -15,7 +16,9 @@ class WebSocketService(BotService):
     async def websocket_notify(self, ws: WebSocket, token: str):
         await ws.accept()
         try:
-            payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+            payload = jwt.decode(
+                token, settings.secret_key, algorithms=[settings.algorithm]
+            )
             username = payload.get("username")
             user = self.user_repo.get_by_username(username)
             if not user:

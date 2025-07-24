@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from fastapi.logger import logger
 from sqlmodel import Session, select
 
 from app.db.database import License, User
@@ -15,10 +14,10 @@ class UserRepository:
         user = self.db.exec(select(User).where(User.username == username)).first()
 
         return user
-    
+
     def get_all_users(self):
         users = self.db.exec(select(User)).all()
-        
+
         return users
 
     def create_user(self, user: User):
@@ -30,7 +29,9 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(db_user)
         except Exception:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="unique constraint")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="unique constraint"
+            )
 
     def link_hwid(self, user: User, new_hwid):
         if user.hwid == "not_linked":

@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from app.config import settings
 from app.db.database import User
 from app.repos.user import UserRepository
-from app.schemas.user import LoginRequest, Token, TokenData
+from app.schemas.user import LoginRequest, Token
 from app.utils.helpers import create_access_token
 
 

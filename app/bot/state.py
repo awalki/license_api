@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import Message
 from aiogram_dialog import Dialog, DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput
-from aiogram.types import Message
 from aiogram_dialog.widgets.kbd import Next
 from aiogram_dialog.widgets.text import Const
 
