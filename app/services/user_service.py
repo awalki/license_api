@@ -16,7 +16,7 @@ class UserService:
         if not authorized.is_admin:
             raise HTTPException(status_code=403, detail="Not authorized")
 
-        user = self.user_repo.get_by_license_id(request.id)
+        user = self.user_repo.get_by_username(request.username)
 
         expires_at = datetime.now(timezone.utc) + timedelta(days=request.days)
 

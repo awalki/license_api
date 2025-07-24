@@ -18,5 +18,5 @@ class TokenData(BaseModel):
 
 
 class LicenseRequest(BaseModel):
-    id: str
+    username: str
     days: int

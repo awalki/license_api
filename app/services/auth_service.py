@@ -36,8 +36,8 @@ class AuthService:
         )
         return Token(access_token=access_token, token_type="bearer")
 
-    async def register(self, request: User, current_user: TokenData):
-        authorized = self.user_repo.get_by_username(current_user.username)
+    async def register(self, request: User, username: str):
+        authorized = self.user_repo.get_by_username(username)
 
         if not authorized.is_admin:
             raise HTTPException(

@@ -2,6 +2,8 @@
 
 A robust license management API built with FastAPI, SQLModel, and aiogram for Telegram integration. This system allows you to easily integrate license validation into your software products to prevent unauthorized usage.
 
+![coverage](https://img.shields.io/badge/coverage-80%25-brightgreen.svg?style=flat-square)
+
 ## ✨ Features
 
 - **License Management**: Create, validate, and manage software licenses
@@ -122,6 +124,11 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+```
+
+## Run tests
+```bash
+PYTHONPATH=. pytest --cov=app --cov-report=term-missing
 ```
 
 ## 🤝 Contributing

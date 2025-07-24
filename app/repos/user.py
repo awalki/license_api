@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from fastapi.logger import logger
 from sqlmodel import Session, select
 
@@ -20,11 +21,6 @@ class UserRepository:
         
         return users
 
-    def get_by_license_id(self, license_id: str) -> User | None:
-        user = self.db.exec(select(User).where(User.license.id == license_id)).first()
-
-        return user
-
     def create_user(self, user: User):
         db_user = User.model_validate(user)
         db_user.password = get_password_hash(db_user.password)
@@ -34,7 +30,7 @@ class UserRepository:
             self.db.commit()
             self.db.refresh(db_user)
         except Exception:
-            logger.error("User with this username already exists")
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="unique constraint")
 
     def link_hwid(self, user: User, new_hwid):
         if user.hwid == "not_linked":
