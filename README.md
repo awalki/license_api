@@ -157,8 +157,8 @@ If you encounter any issues:
 - [x] Authentication system
 - [x] Docker support
 - [x] API rate limiting
+- [x] Test coverage (80%)
 - [ ] More Database support
 - [ ] Web dashboard
-- [ ] Test coverage
 - [ ] License analytics
 - [ ] Bulk operations
