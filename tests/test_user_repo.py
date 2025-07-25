@@ -97,14 +97,16 @@ def test_user_repo(session: Session):
 
     assert not is_auth
 
-    unknown_user = user_repo.get_by_username("unknown_user")
+    with pytest.raises(HTTPException) as exc_info:
+        unknown_user = user_repo.get_by_username("unknown_user")
 
-    login_request = LoginRequest(
-        username="unknown_username", password="12345", hwid="new_hwid"
-    )
+        login_request = LoginRequest(
+            username="unknown_username", password="12345", hwid="new_hwid"
+        )
 
-    is_auth = user_repo.authenticate_user(unknown_user, login_request)
+        is_auth = user_repo.authenticate_user(unknown_user, login_request)
 
+    assert exc_info.value.status_code == 401
     assert not is_auth
 
     user.license.expires_at = datetime.now(timezone.utc) + timedelta(minutes=-5)
@@ -113,9 +115,7 @@ def test_user_repo(session: Session):
 
     assert not is_auth
 
-    login_request = LoginRequest(
-        username="unknown_username", password="12345", hwid="new_hwid"
-    )
+    login_request = LoginRequest(username="testuser", password="12345", hwid="new_hwid")
 
     user.license = None
 
@@ -123,9 +123,7 @@ def test_user_repo(session: Session):
 
     assert not is_auth
 
-    login_request = LoginRequest(
-        username="unknown_username", password="12345", hwid="new_hwid"
-    )
+    login_request = LoginRequest(username="testuser", password="12345", hwid="new_hwid")
 
     user.is_banned = True
     is_auth = user_repo.authenticate_user(user, login_request)

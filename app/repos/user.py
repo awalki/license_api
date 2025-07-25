@@ -10,13 +10,23 @@ class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_by_username(self, username: str) -> User | None:
+    def get_by_username(self, username: str) -> User:
         user = self.db.exec(select(User).where(User.username == username)).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="unauthorized"
+            )
 
         return user
 
     def get_all_users(self):
         users = self.db.exec(select(User)).all()
+
+        if not users:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="unauthorized"
+            )
 
         return users
 
@@ -53,9 +63,7 @@ class UserRepository:
         self.db.commit()
         self.db.refresh(license)
 
-    def authenticate_user(self, user: User | None, request: LoginRequest):
-        if not user:
-            return False
+    def authenticate_user(self, user: User, request: LoginRequest):
         if not verify_password(request.password, user.password):
             return False
         if user.is_banned:
