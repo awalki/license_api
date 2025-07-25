@@ -9,6 +9,7 @@ dependencies = [
     "aiogram-dialog>=2.4.0",
     "aioredis>=2.0.1",
     "anyio>=4.9.0",
+    "argon2-cffi>=25.1.0",
     "coverage>=7.8.2",
     "fastapi-limiter>=0.1.6",
     "fastapi[standard]>=0.115.12",

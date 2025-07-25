@@ -7,6 +7,7 @@ from app.config import settings
 from app.db.database import License, User, get_session
 from app.main import app
 from app.schemas.user import TokenData
+from app.utils.helpers import get_password_hash
 
 settings.admin_id = "123"
 settings.secret_key = "test_secret"
@@ -22,7 +23,7 @@ class DummyRepo:
         return User(
             id="1",
             username=username,
-            password="$2b$12$jBbGxrDmMNE234r90EwdQeAkjXG6w4nIRNkYBB.x7B4.6Sm4lnY9O",
+            password=get_password_hash("1234"),
             is_banned=False,
             is_admin=True,
             license=None,

@@ -6,7 +6,15 @@ from passlib.context import CryptContext
 
 from app.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["argon2"],
+    deprecated="auto",
+    argon2__type="ID",
+    argon2__memory_cost=19 * 1024,
+    argon2__time_cost=2,
+    argon2__parallelism=1,
+)
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

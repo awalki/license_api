@@ -30,7 +30,7 @@ class DummyRepo:
         return User(
             id="1",
             username=username,
-            password="$2b$12$jBbGxrDmMNE234r90EwdQeAkjXG6w4nIRNkYBB.x7B4.6Sm4lnY9O",
+            password=get_password_hash("1234"),
             is_banned=False,
             is_admin=True,
             license=License(expires_at=datetime.now(timezone.utc) + timedelta(days=1)),
