@@ -25,7 +25,7 @@ class UserRepository:
 
         if not users:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="unauthorized"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="unauthorized"
             )
 
         return users
